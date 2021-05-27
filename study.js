@@ -9,3 +9,28 @@ testRegex.test(testStr);
 // /yes|no|maybe/.
 
 // You can also extract the actual matches you found with the .match() method.
+"string".match(/regex/);
+/regex/.test("string"); //its the reverse order
+//it extracts the word from the string
+let testStr = "Repeat, Repeat, Repeat";
+let ourRegex = /Repeat/;
+testStr.match(ourRegex); //Here match would return ["Repeat"].
+let repeatRegex = /Repeat/g; 
+testStr.match(repeatRegex);//["Repeat", "Repeat", "Repeat"]
+//ok so Im going to use it to check
+
+let twinkleStar = "Twinkle, twinkle, little star";
+let starRegex = /twinkle/gi; 
+let result = twinkleStar.match(starRegex); 
+
+let exampleStr = "Let's have fun with regular expressions!";
+let unRegex = /.un/;
+let result = unRegex.test(exampleStr);
+
+let quoteSample = "The quick brown fox jumps over the lazy dog.";
+let alphabetRegex = /[a-z]/gi; // Change this line
+let result = quoteSample.match(alphabetRegex); // Change this line
+
+let quoteSample = "Blueberry 3.141592653s are delicious.";
+let myRegex = /[h-s2-6]/ig; // Change this line
+let result = quoteSample.match(myRegex); // Change this line
