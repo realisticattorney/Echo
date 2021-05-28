@@ -48,9 +48,9 @@ bot.use((ctx) => {
     result.setDate(result.getDate() + days);
     return result;
   }
-      let d = new Date();
+  let d = new Date();
   d.setDate(d.getDate() + 5);
-  console.log(`${d}`)
+  console.log(`${d}`);
   console.log(addDays(5));
   let [time_date, time_exact] = time_now.split(", ");
   let [time_exact_hour, time_exact_min, time_exact_sec_am] =
@@ -59,27 +59,48 @@ bot.use((ctx) => {
 
   if (test_this == 1 || test_next == 1) {
     let day_DAY = thisFunction(reply);
-    console.log(day_DAY)
+    console.log(day_DAY);
 
     let whichDate =
       test_next == 1 ? dateFinder(day_DAY, 1) : dateFinder(day_DAY, 0);
+    let date_now = new Date();
+    let date_now_s = date_now.setDate(date_now.getDate() + whichDate);
+    let date_now_string = `${date_now}`;
 
-    console.log(whichDate)
-    console.log(time_now);
+    console.log(whichDate);
+    console.log(date_now);
+    console.log(date_now_string);
+    let [alarm_year, alarm_month, alarm_day_hour] = date_now
+      .toISOString()
+      .split("-");
+    let [alarm_day, alarm_time] = alarm_day_hour.split("T");
+    alarm_time = alarm_time.split('.')[0]
+    let [alarm_h, alarm_m, alarm_s] = alarm_time.split(":");
+    console.log(alarm_year);
+    console.log(alarm_month);
+    console.log(alarm_day_hour);
+    console.log(alarm_day);
+    console.log(alarm_time);
+    console.log(alarm_h);
+    console.log(alarm_m);
+    console.log(alarm_s);
     console.log(time_date);
     console.log(time_exact);
     console.log(time_exact_hour);
     console.log(time_exact_min);
     console.log(time_exact_sec);
     console.log(time_exact_am_pm);
+    let replace = "*/1";
+    cron.schedule(`${0} ${20} ${19} ${alarm_day} ${alarm_month} * ${alarm_year}`, () => {
+      bot.telegram.sendMessage(
+        ctx.message.chat.id,
+        `${"Hey " + ctx.message.chat.first_name + ". dsdasdasda" + reply}`
+      );
+    });
+  } else {
+    return ctx.reply("The syntax must be: This/Next dayofweek task");
   }
-  let replace = "*/1";
-  cron.schedule(`${replace} * * * *`, () => {
-    bot.telegram.sendMessage(
-      ctx.message.chat.id,
-      `${"Hey " + ctx.message.chat.first_name + ". " + reply}`
-    );
-  });
+
   console.log(ctx.update);
   console.log(ctx.message.chat.id);
   // let time_now = new Date().toLocaleString();
@@ -94,16 +115,16 @@ bot.use((ctx) => {
 bot.launch();
 
 const dateFinder = (weekday, this_or_next) => {
-  let i = this_or_next == 0? 0 : 7;
+  let i = this_or_next == 0 ? 0 : 7;
   let limit = this_or_next == 0 ? 7 : 14;
   for (i; i < limit; i++) {
     let d = new Date();
     let dd = d.setDate(d.getDate() + i);
-    let d_s = `${d}`
+    let d_s = `${d}`;
     console.log(d_s);
     let match_check = d_s.split(" ")[0];
-    console.log(match_check)
-    console.log(weekday)
+    console.log(match_check);
+    console.log(weekday);
     console.log(d.setDate(d.getDate() + i));
 
     if (match_check.toUpperCase() == weekday) {
