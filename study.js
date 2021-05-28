@@ -79,3 +79,42 @@ sentence.match(shortHand);
 
 // The shortcut to look for digit characters is \d, with a lowercase d. This is equal to the character class [0-9]
 // Use the shorthand character class for non-digits \D to count how many non-digits are in movie titles.
+
+
+let username = "JackOfAllTrades";
+let userCheck = /^[a-z][a-z]+\d*$|^[a-z]\d\d+$/i;
+let result = userCheck.test(username);
+
+// Usernames can only use alpha-numeric characters.
+
+// The only numbers in the username have to be at the end. There can be zero or more of them at the end. Username cannot start with the number.
+
+// Username letters can be lowercase and uppercase.
+
+// Usernames have to be at least two characters long. A two-character username can only use alphabet letters as characters.
+
+// You can search for whitespace using \s, which is a lowercase s. This pattern not only matches whitespace, but also carriage return, tab, form feed, and new line characters. You can think of it as similar to the character class [ \r\t\f\n\v].
+
+// You can also search for everything except whitespace.
+let whiteSpace = "Whitespace. Whitespace everywhere!";
+let nonSpaceRegex = /\S/g;
+whiteSpace.match(nonSpaceRegex).length;
+
+// Recall that you use the plus sign + to look for one or more characters and the asterisk * to look for zero or more characters
+
+
+let A4 = "aaaah";
+let A2 = "aah";
+let multipleA = /a{3,5}h/;
+multipleA.test(A4);
+multipleA.test(A2);
+// The first test call would return true, while the second would return false.
+
+let ohStr = "Ohhh no";
+let ohRegex = /Oh{3,6}\sno/; 
+let multipleA = /ha{3,}h/; //no upper limit
+
+// Sometimes the patterns you want to search for may have parts of it that may or may not exist.
+let american = "color";
+let british = "colour";
+let rainbowRegex = /colou?r/;
