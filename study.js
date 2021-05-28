@@ -118,3 +118,38 @@ let multipleA = /ha{3,}h/; //no upper limit
 let american = "color";
 let british = "colour";
 let rainbowRegex = /colou?r/;
+
+let pwRegex =   /(?=\w{6})(?=\w*\d{2})/;
+//matches passwords that are greater than 5 characters long, and have two consecutive digits.
+
+let myString = "Eleanor Roosevelt";
+let myRegex = /(Franklin|Eleanor).*Roosevelt/;
+let result = myRegex.test(myString); // Change this line
+// After passing the challenge experiment with myString and see how the grouping works
+
+let wrongText = "The sky is silver.";
+let silverRegex = /silver/;
+wrongText.replace(silverRegex, "blue");
+
+
+let hello = "   Hello, World!  ";
+let wsRegex =  /^\s+|\s+$/g; // 
+let result = hello.replace(wsRegex, ""); // 
+
+
+
+remind me that this friday is my mom's birthday
+This saturday I have chess classes. Remind me friday at night
+Friday night I go to my gf house. Remind me in the morning./at 2pm.
+next week I start the gym wednesdays and friday.
+
+
+replace "I" for "you" and "my" for "your" and remind me for "I'll remind you" and reply "Ok" This saturday + "You" have chess classes.  "I'll remind you friday at night".
+
+this\s?=(dayofweek) + remind me\s?=(dayofweek)//setDate of this//
+next\s?=(dayofweek) + remind me\s?=(dayofweek)//setDate of next//
+I have chess classes this saturday. Remind me friday at night
+Remind me friday at night I have chess classes this saturday
+
+this friday I have chess classes
+next friday I have chess classes
