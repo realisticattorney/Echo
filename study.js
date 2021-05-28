@@ -67,3 +67,15 @@ let result = lastRegex.test(caboose);
 let quoteSample = "The five boxing wizards jump quickly.";
 let alphabetRegexV2 = /\w/gi; // Change this line
 let result = quoteSample.match(alphabetRegexV2).length; //returns the amount of characters
+
+// You can search for the opposite of the \w with \W. Note, the opposite pattern uses a capital letter. This shortcut is the same as [^A-Za-z0-9_].
+
+let shortHand = /\W/;
+let numbers = "42%";
+let sentence = "Coding!";
+numbers.match(shortHand);
+sentence.match(shortHand);
+// The first match call would return the value ["%"] and the second would return ["!"].
+
+// The shortcut to look for digit characters is \d, with a lowercase d. This is equal to the character class [0-9]
+// Use the shorthand character class for non-digits \D to count how many non-digits are in movie titles.
