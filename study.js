@@ -44,3 +44,26 @@ let result = quoteSample.match(myRegex); //matches all characters that are not a
 let difficultSpelling = "Mississippi";
 let myRegex = /s+/g; // Change this line
 let result = difficultSpelling.match(myRegex);
+
+let chewieRegex = /Aa*/; //Aaaaaaaarrgh (returns Aaaaaaaaa)
+
+let result = chewieQuote.match(chewieRegex);
+
+let text = "<h1>Winter is coming</h1>";
+let myRegex = /<.*?>/; // Change this line
+let result = text.match(myRegex);
+
+// In an earlier challenge, you used the caret character (^) inside a character set to create a negated character set in the form [^thingsThatWillNotBeMatched]. Outside of a character set, the caret is used to search for patterns at the beginning of strings.
+let firstString = "Ricky is first and can be found.";
+let firstRegex = /^Ricky/;
+firstRegex.test(firstString);
+let notFirst = "You can't find Ricky now.";
+firstRegex.test(notFirst);
+
+let caboose = "The last car on a train is the caboose";
+let lastRegex = /caboose$/; // searches caboose at the end of the string
+let result = lastRegex.test(caboose);
+
+let quoteSample = "The five boxing wizards jump quickly.";
+let alphabetRegexV2 = /\w/gi; // Change this line
+let result = quoteSample.match(alphabetRegexV2).length; //returns the amount of characters
