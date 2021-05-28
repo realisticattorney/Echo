@@ -34,3 +34,13 @@ let result = quoteSample.match(alphabetRegex); // Change this line
 let quoteSample = "Blueberry 3.141592653s are delicious.";
 let myRegex = /[h-s2-6]/ig; // Change this line
 let result = quoteSample.match(myRegex); // Change this line
+
+// For example, /[^aeiou]/gi matches all characters that are not a vowel. Note that characters like ., !, [, @, / and white space are matched - the negated vowel character set only excludes the vowel characters.
+
+let quoteSample = "3 blind mice.";
+let myRegex = /[^0-9aeiou]/gi; // ^ negates
+let result = quoteSample.match(myRegex); //matches all characters that are not a number or a vowel.
+
+let difficultSpelling = "Mississippi";
+let myRegex = /s+/g; // Change this line
+let result = difficultSpelling.match(myRegex);

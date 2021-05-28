@@ -23,7 +23,8 @@ bot.use((ctx) => {
  let reg_this = /t[hi][ihs][si]/i.test(message); //this >> 1 // this next >> 2 //thisnext >>22
  let reg_next = /next/i.test(message); 
   let match_this = message.match(/t[hi][ihs][si]/gi); //match is like slide, not splite (its good)
-  ctx.reply(reg_this + reg_next + match_this + message)
+  let match_this2 = message.match(/[^h]/gi); //returns an array with each items being a character NOT mention in the match (via negativa)
+  ctx.reply(reg_this + reg_next + match_this + match_this2 + message);
   console.log(match_this) //it returns an array
 })
 
