@@ -4,7 +4,6 @@ const { BITBUCKET } = require("ci-info");
 const { time } = require("console");
 const { Telegraf } = require("telegraf");
 const cron = require("node-cron");
-// const express = require("express");
 
 const bot = new Telegraf("1711136458:AAH8wlMvtdcp9RtMLOVJmd3fCqlTWq8XR1w");
 
@@ -22,26 +21,25 @@ bot.start((ctx) => {
 
 bot.use((ctx) => {
   let message = ctx.message.text;
-  let date;
-  //  let reg_this = /t[hi][iohs][si]/i.test(message); //this >> 1 // this next >> 2 //thisnext >>22
-  //  let reg_next = /next/i.test(message);
-  //   let match_this = message.match(/t[hi][iohs][si]\s(?=mo[nd][dn]ay|tuesday|wednesday|thursday|friday|saturday|sunday)/gi); //match is like slide, not splite (its good)
-  //   let match_this2 = message.match(/[^h]/gi); //returns an array with each items being a character NOT mention in the match (via negativa)
-  // let answer_match = message.match(
-  //   /t[hi][iohs][si]\s(?=mo[nd][dn]ay|tuesday|wednesday|thursday|friday|saturday|sunday)/gi
-  // );
   let this_regex =
-    /^this\s(monday|tuesday|wednesday|thursday|friday|saturday|sunday)/i;
+    /[re][mer][emi][imn][ind][nd]\sme\son\s(monday|tuesday|wednesday|thursday|friday|saturday|sunday)\sat\s\d([ap]m|\s[ap]m|:\d\d[ap]m)/i;
   let next_regex =
-    /next\s(monday|tuesday|wednesday|thursday|friday|saturday|sunday)/i;
+    /[re][mer][emi][imn][ind][nd]\sme\snext\s(monday|tuesday|wednesday|thursday|friday|saturday|sunday)at\s\d([ap]m|\s[ap]m|:\d\d[ap]m)/i;
+
   let test_this = this_regex.test(message);
   let test_next = next_regex.test(message);
+  let match_dot = message.match(/\./)
+  let message_first_half = message.slice(0, match_dot.index);
+  let message_second_half = message.slice(match_dot.index); 
+
   let replace_you_i = message.replace(/I/, "you");
-  let match_you_i = message.match(/I/);
   let replace_my_your = replace_you_i.replace(/my/, "your");
   let reply = replace_my_your.replace(/remind\sme/i, "I'll remind you");
+
   let match_this = message.match(/t[hi][ihs][si]/gi);
-  let time_now = new Date().toLocaleString();
+ let time_now = new Date().toLocaleString();
+  console.log(message_first_half) 
+  console.log(message_second_half)
   // To add Days
   function addDays(days) {
     var result = new Date();
@@ -58,7 +56,7 @@ bot.use((ctx) => {
   let [time_exact_sec, time_exact_am_pm] = time_exact_sec_am.split(" ");
 
   if (test_this == 1 || test_next == 1) {
-    let day_DAY = thisFunction(reply);
+    let day_DAY = thisFunction(message_second_half);
     console.log(day_DAY);
 
     let whichDate =
@@ -74,7 +72,7 @@ bot.use((ctx) => {
       .toISOString()
       .split("-");
     let [alarm_day, alarm_time] = alarm_day_hour.split("T");
-    alarm_time = alarm_time.split('.')[0]
+    alarm_time = alarm_time.split(".")[0];
     let [alarm_h, alarm_m, alarm_s] = alarm_time.split(":");
     console.log(alarm_year);
     console.log(alarm_month);
@@ -91,12 +89,15 @@ bot.use((ctx) => {
     console.log(time_exact_sec);
     console.log(time_exact_am_pm);
     let replace = "*/1";
-    cron.schedule(`${0} ${20} ${19} ${alarm_day} ${alarm_month} * ${alarm_year}`, () => {
-      bot.telegram.sendMessage(
-        ctx.message.chat.id,
-        `${"Hey " + ctx.message.chat.first_name + ". dsdasdasda" + reply}`
-      );
-    });
+    cron.schedule(
+      `${0} ${40} ${21} ${alarm_day} ${alarm_month} * ${alarm_year}`,
+      () => {
+        bot.telegram.sendMessage(
+          ctx.message.chat.id,
+          `${"Hey " + ctx.message.chat.first_name + ". dsdasdasda" + reply}`
+        );
+      }
+    );
   } else {
     return ctx.reply("The syntax must be: This/Next dayofweek task");
   }
