@@ -11,14 +11,6 @@ bot.start((ctx) => {
   ctx.reply("Welcome");
 });
 
-// bot.hears(" ", (ctx) => {
-//   ctx.reply("Welcome " + ctx.message.text);
-// });
-// // bot.hears("this", (ctx) => {
-
-// //   ctx.reply("Welcome " + ctx.message.text);
-// // });
-
 bot.use((ctx) => {
   let message = ctx.message.text;
   let this_regex =
@@ -41,22 +33,6 @@ bot.use((ctx) => {
 
   let match_this = message.match(/t[hi][ihs][si]/gi);
   let time_now = new Date().toLocaleString();
-  // To add Days
-  // function addDays(days) {
-  //   var result = new Date();
-  //   result.setDate(result.getDate() + days);
-  //   return result;
-  // }
-  // let d = new Date();
-  // d.setDate(d.getDate() + 5);
-  // console.log(`${d}` + "${d}");
-  // console.log(d.getDate() + "d.getDate()");
-  // console.log(addDays(5) + "addDays(5)");
-  console.log(time_now);
-  let [time_date, time_exact] = time_now.split(", ");
-  let [time_exact_hour, time_exact_min, time_exact_sec_am] =
-    time_exact.split(":");
-  let [time_exact_sec, time_exact_am_pm] = time_exact_sec_am.split(" ");
 
   if (test_this == 1 || test_next == 1) {
     let day_DAY = thisFunction(message_second_half);
@@ -65,43 +41,21 @@ bot.use((ctx) => {
     let whichDate =
       test_next == 1 ? dateFinder(day_DAY, 1) : dateFinder(day_DAY, 0);
     let date_now = new Date();
-    let date_now_s = date_now.setDate(date_now.getDate() + whichDate);
+    date_now.setDate(date_now.getDate() + whichDate);
     let date_now_string = `${date_now}`;
 
     console.log(whichDate);
     console.log(date_now_string);
-    // let [alarm_year, alarm_month, alarm_day_hour] = date_now
-    //   .toISOString()
-    //   .split("-");
-     date_now_string = date_now_string.toString();
-    let [dayweek, month, day, year, time] = date_now_string.split(" ")
-    console.log(dayweek, month, day, year, time)
-    // let [alarm_day, alarm_time] = alarm_day_hour.split("T");
-    // alarm_time = alarm_time.split(".")[0];
-    // let [alarm_h, alarm_m, alarm_s] = alarm_time.split(":");
-    // console.log(alarm_year);
-    // console.log(alarm_month);
-    // console.log(alarm_day_hour);
-    // console.log(alarm_day);
-    // console.log(alarm_time);
-    // console.log(alarm_h);
-    // console.log(alarm_m);
-    // console.log(alarm_s);
-    // console.log(time_date);
-    // console.log(time_exact);
-    // console.log(time_exact_hour);
-    // console.log(time_exact_min);
-    // console.log(time_exact_sec);
-    // console.log(time_exact_am_pm);
-    cron.schedule(
-      `${0} ${19} ${22} ${day} ${month} * ${year}`,
-      () => {
-        bot.telegram.sendMessage(
-          ctx.message.chat.id,
-          `${"Hey " + ctx.message.chat.first_name + ". " + reply_first_half}`
-        );
-      }
-    );
+    
+    date_now_string = date_now_string.toString();
+    let [dayweek, month, day, year, time] = date_now_string.split(" ");
+    console.log(dayweek, month, day, year, time);
+    cron.schedule(`${0} ${23} ${23} ${day} ${month} * ${year}`, () => {
+      bot.telegram.sendMessage(
+        ctx.message.chat.id,
+        `${"Hey " + ctx.message.chat.first_name + ". " + reply_first_half}`
+      );
+    });
   } else {
     return ctx.reply("The syntax must be: This/Next dayofweek task");
   }
