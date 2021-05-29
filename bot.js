@@ -22,34 +22,37 @@ bot.start((ctx) => {
 bot.use((ctx) => {
   let message = ctx.message.text;
   let this_regex =
-    /[re][mer][emi][imn][ind][nd]\sme\son\s(monday|tuesday|wednesday|thursday|friday|saturday|sunday)\sat\s\d([ap]m|\s[ap]m|:\d\d[ap]m)/i;
+    /[re][mer][emi][imn][ind][nd]\sme\sthis\s(monday|tuesday|wednesday|thursday|friday|saturday|sunday)\sat\s\d([ap]m|\s[ap]m|:\d\d[ap]m)/i;
   let next_regex =
     /[re][mer][emi][imn][ind][nd]\sme\snext\s(monday|tuesday|wednesday|thursday|friday|saturday|sunday)at\s\d([ap]m|\s[ap]m|:\d\d[ap]m)/i;
 
   let test_this = this_regex.test(message);
   let test_next = next_regex.test(message);
-  let match_dot = message.match(/\./)
-  let message_first_half = message.slice(0, match_dot.index);
-  let message_second_half = message.slice(match_dot.index); 
+
+  let match_dot = message.match(/\./);
+  let message_second_half = message.slice(match_dot.index);
 
   let replace_you_i = message.replace(/I/, "you");
   let replace_my_your = replace_you_i.replace(/my/, "your");
   let reply = replace_my_your.replace(/remind\sme/i, "I'll remind you");
 
+  let reply_dot = reply.match(/\./);
+  let reply_first_half = reply.slice(0, reply_dot.index);
+
   let match_this = message.match(/t[hi][ihs][si]/gi);
- let time_now = new Date().toLocaleString();
-  console.log(message_first_half) 
-  console.log(message_second_half)
+  let time_now = new Date().toLocaleString();
   // To add Days
-  function addDays(days) {
-    var result = new Date();
-    result.setDate(result.getDate() + days);
-    return result;
-  }
-  let d = new Date();
-  d.setDate(d.getDate() + 5);
-  console.log(`${d}`);
-  console.log(addDays(5));
+  // function addDays(days) {
+  //   var result = new Date();
+  //   result.setDate(result.getDate() + days);
+  //   return result;
+  // }
+  // let d = new Date();
+  // d.setDate(d.getDate() + 5);
+  // console.log(`${d}` + "${d}");
+  // console.log(d.getDate() + "d.getDate()");
+  // console.log(addDays(5) + "addDays(5)");
+  console.log(time_now);
   let [time_date, time_exact] = time_now.split(", ");
   let [time_exact_hour, time_exact_min, time_exact_sec_am] =
     time_exact.split(":");
@@ -57,8 +60,8 @@ bot.use((ctx) => {
 
   if (test_this == 1 || test_next == 1) {
     let day_DAY = thisFunction(message_second_half);
-    console.log(day_DAY);
-
+    console.log(day_DAY + "day_DAY");
+    console.log(test_this + "test_this");
     let whichDate =
       test_next == 1 ? dateFinder(day_DAY, 1) : dateFinder(day_DAY, 0);
     let date_now = new Date();
@@ -66,35 +69,36 @@ bot.use((ctx) => {
     let date_now_string = `${date_now}`;
 
     console.log(whichDate);
-    console.log(date_now);
     console.log(date_now_string);
-    let [alarm_year, alarm_month, alarm_day_hour] = date_now
-      .toISOString()
-      .split("-");
-    let [alarm_day, alarm_time] = alarm_day_hour.split("T");
-    alarm_time = alarm_time.split(".")[0];
-    let [alarm_h, alarm_m, alarm_s] = alarm_time.split(":");
-    console.log(alarm_year);
-    console.log(alarm_month);
-    console.log(alarm_day_hour);
-    console.log(alarm_day);
-    console.log(alarm_time);
-    console.log(alarm_h);
-    console.log(alarm_m);
-    console.log(alarm_s);
-    console.log(time_date);
-    console.log(time_exact);
-    console.log(time_exact_hour);
-    console.log(time_exact_min);
-    console.log(time_exact_sec);
-    console.log(time_exact_am_pm);
-    let replace = "*/1";
+    // let [alarm_year, alarm_month, alarm_day_hour] = date_now
+    //   .toISOString()
+    //   .split("-");
+     date_now_string = date_now_string.toString();
+    let [dayweek, month, day, year, time] = date_now_string.split(" ")
+    console.log(dayweek, month, day, year, time)
+    // let [alarm_day, alarm_time] = alarm_day_hour.split("T");
+    // alarm_time = alarm_time.split(".")[0];
+    // let [alarm_h, alarm_m, alarm_s] = alarm_time.split(":");
+    // console.log(alarm_year);
+    // console.log(alarm_month);
+    // console.log(alarm_day_hour);
+    // console.log(alarm_day);
+    // console.log(alarm_time);
+    // console.log(alarm_h);
+    // console.log(alarm_m);
+    // console.log(alarm_s);
+    // console.log(time_date);
+    // console.log(time_exact);
+    // console.log(time_exact_hour);
+    // console.log(time_exact_min);
+    // console.log(time_exact_sec);
+    // console.log(time_exact_am_pm);
     cron.schedule(
-      `${0} ${40} ${21} ${alarm_day} ${alarm_month} * ${alarm_year}`,
+      `${0} ${19} ${22} ${day} ${month} * ${year}`,
       () => {
         bot.telegram.sendMessage(
           ctx.message.chat.id,
-          `${"Hey " + ctx.message.chat.first_name + ". dsdasdasda" + reply}`
+          `${"Hey " + ctx.message.chat.first_name + ". " + reply_first_half}`
         );
       }
     );
@@ -106,7 +110,7 @@ bot.use((ctx) => {
   console.log(ctx.message.chat.id);
   // let time_now = new Date().toLocaleString();
   // console.log(time_now);
-  ctx.reply(reply + ". I'll remind you.");
+  ctx.reply(reply);
   bot.hears("this", (ctx) => {
     console.log(ctx);
   });
