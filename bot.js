@@ -11,7 +11,6 @@ const bot = new Telegraf("1709314984:AAHXqCrhxdFoGbM8MJAVWUAElrPdhQA7x8w");
 //super easy to set the alarm in absolute values. That's what I did by setting the this and next week. That's hard. Setting the time by asking it it's easy af
 //my approach is confusing. At some parts I manipulate the current time so I get the time the alarm will be triggered by interpreting the user message. But I only modify some of the variables. So for instance I have the day, month and year of the (future) promise, but the hour and minutes of current time (as those went through my functions without changes)
 
-//have to avoid 00:12pm, and 00:12am (it's not that relevant)
 //got an idea, the start message is a tutorial? How so? has a "I'll visit mom this weekend. Remind me in 20 seconds" Try it! If the user actually sends that, it receives an answer from a ctx.hear("I'll visit mom this weekend. Remind me in 20 seconds") as well as the alarm set to 20 seconds! Then it gets the following message:
 //"Fantastic! Remember that you can use absolute units (19 of july, 10:41pm/am, 2 pm, 6am) as relative to the moment you talk to me such as next friday, today, tomorrow, in 40 minutes, in 6 hours. However, I don't like units such as 23:32, or 16:00. It's so confusing. "
 
@@ -33,7 +32,7 @@ bot.start((ctx) => {
     "This is how I work: Tell me what you want to remind you and at which time. That's it!"
   );
   ctx.reply(
-    "Here's an example: I'll visit mom on the weekend. Remind me this saturday at 10am"
+    "Here's an example: I'll visit mom this weekend. Remind me this saturday at 10am"
   );
   ctx.reply("Try the example above to continue the tutorial! To hear a ");
 });
@@ -41,11 +40,11 @@ bot.start((ctx) => {
 bot.use((ctx) => {
   let message = ctx.message.text;
   let this_regex =
-    /[re][mer][emi][imn][ind][nd]\sme\sthis\s(monday|tuesday|wednesday|thursday|friday|saturday|sunday)\sat\s\d[012]?([ap]m|\s[ap]m|:\d\d[ap]m|:\d\d\s[ap]m)/i;
+    /[re][mer][emi][imn][ind][nd]\sme\s(this|on)\s(monday|tuesday|wednesday|thursday|friday|saturday|sunday)\sat\s\d[012]?([ap]m|\s[ap]m|:\d\d[ap]m|:\d\d\s[ap]m)/i;
   let next_regex =
     /[re][mer][emi][imn][ind][nd]\sme\snext\s(monday|tuesday|wednesday|thursday|friday|saturday|sunday)at\s\d[012]?([ap]m|\s[ap]m|:\d\d[ap]m|:\d\d\s[ap]m)/i;
   let absolute_date =
-    /[re][mer][emi][imn][ind][nd]\sme\sthe\s\d\d?\sof\s(january|february|march|april|may|june|july|august|september|october|november|december)\sat\s\d[012]?([ap]m|\s[ap]m|:\d\d[ap]m|:\d\d\s[ap]m)/i;
+    /[re][mer][emi][imn][ind][nd]\sme\son\s\d\d?\s(january|february|march|april|may|june|july|august|september|october|november|december)\sat\s\d[012]?([ap]m|\s[ap]m|:\d\d[ap]m|:\d\d\s[ap]m)/i;
   //checks whether is this week or next ()
   let test_this = this_regex.test(message);
   let test_next = next_regex.test(message);
@@ -78,7 +77,15 @@ bot.use((ctx) => {
   //replaces the subject from first to second person in sequence
   let replace_you_i = message.replace(/I/, "you");
   let replace_my_your = replace_you_i.replace(/my/, "your");
-  let reply = replace_my_your.replace(/remind\sme/i, "I'll remind you");
+  let match_first_char = replace_my_your.match(/^[a-z]?/);
+  function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  }
+  let replace_capitalize_first = capitalizeFirstLetter(replace_my_your);
+  let reply = replace_capitalize_first.replace(
+    /remind\sme/i,
+    "I'll remind you"
+  );
 
   //match the dot and slice afterwards. It gets the whole command part of the message users send. It only uses the first part as it's the reason the user set the alarm
   let reply_dot = reply.match(/\./);
@@ -97,7 +104,8 @@ bot.use((ctx) => {
     (is_pm == 1 || is_am == 1)
   ) {
     //takes the outside, global declared var to return the day of the week from the latter part of the message
-    let day_DAY = test_absolute_date == 0 ? thisFunction(message_second_half) : 0;
+    let day_DAY =
+      test_absolute_date == 0 ? thisFunction(message_second_half) : 0;
     //debugging
     console.log(day_DAY + "day_DAY");
     console.log(test_this + "test_this");
@@ -142,13 +150,13 @@ bot.use((ctx) => {
 
     day =
       typeof absolute_date_message == typeof message
-        ? message_second_half.split("me the ")[1].split(" ")[0]
+        ? message_second_half.split("me on ")[1].split(" ")[0]
         : day;
     month =
       typeof absolute_date_message == typeof message
         ? message_second_half
-            .split("me the ")[1]
-            .split(" ")[2]
+            .split("me on ")[1]
+            .split(" ")[1]
             .split(".")
             .join("")
         : month;
@@ -168,9 +176,6 @@ bot.use((ctx) => {
   console.log(ctx.update);
   console.log(ctx.message.chat.id);
   ctx.reply(reply);
-  bot.hears("this", (ctx) => {
-    console.log(ctx);
-  });
 }); //here the use method finishes. it's triggered by ANY interaction with the bot
 
 //without this the bot never starts
