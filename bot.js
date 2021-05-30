@@ -12,6 +12,9 @@ const bot = new Telegraf("1711136458:AAH8wlMvtdcp9RtMLOVJmd3fCqlTWq8XR1w");
 //my approach is confusing. At some parts I manipulate the current time so I get the time the alarm will be triggered by interpreting the user message. But I only modify some of the variables. So for instance I have the day, month and year of the (future) promise, but the hour and minutes of current time (as those went through my functions without changes)
 
 //have to avoid 00:12pm, and 00:12am (it's not that relevant)
+//got an idea, the start message is a tutorial? How so? has a "I'll visit mom this weekend. Remind me in 20 seconds" Try it! If the user actually sends that, it receives an answer from a ctx.hear("I'll visit mom this weekend. Remind me in 20 seconds") as well as the alarm set to 20 seconds! Then it gets the following message:
+//"Fantastic! Remember that you can use absolute units (19 of july, 10:41pm/am, 2 pm, 6am) as relative to the moment you talk to me such as next friday, today, tomorrow, in 40 minutes, in 6 hours. However, I don't like units such as 23:32, or 16:00. It's so confusing. "
+
 
 //to do: more complete /start response (with instructions & everything)
 //should have an alarm for "in an hour?"
@@ -26,7 +29,10 @@ const bot = new Telegraf("1711136458:AAH8wlMvtdcp9RtMLOVJmd3fCqlTWq8XR1w");
 //premium:
 //should have a personal config for whenever at: is not specified
 bot.start((ctx) => {
-  ctx.reply("Welcome");
+  ctx.reply(`Hi ${ctx.message.chat.first_name}! Thank you for having me`);
+  ctx.reply(
+    "This is I work: Tell me what to remind you and at which time. That's it. I'll give you an example: I'll visit mom on the weekend. Remind me this saturday at 10am"
+  );
 });
 
 bot.use((ctx) => {
@@ -53,6 +59,10 @@ bot.use((ctx) => {
   let is_pm = message_time_at_wo_at.includes("pm") ? 1 : 0;
   let is_am = message_time_at_wo_at.includes("am") ? 1 : 0;
 
+  let message_time_wo_at_wo_pmam = message_time_at_wo_at.split(" ").join("").split("p").join("").split("a").join("").split("m").join("")
+  console.log(message_time_wo_at_wo_pmam);
+
+
   //replaces the subject from first to second person in sequence
   let replace_you_i = message.replace(/I/, "you");
   let replace_my_your = replace_you_i.replace(/my/, "your");
@@ -66,6 +76,10 @@ bot.use((ctx) => {
   let time_now = new Date().toLocaleString();
   //
   //if the command was properly written, it should include instructions to get the alarm this week or the next one
+  //************ 
+  //************ 
+  //************ 
+  //************ 
   if ((test_this == 1 || test_next == 1) && (is_pm == 1 || is_am == 1)) {
     //takes the outside, global declared var to return the day of the week from the latter part of the message
     let day_DAY = thisFunction(message_second_half);
@@ -91,8 +105,21 @@ bot.use((ctx) => {
     //use it as params for the schedule API cron:
     console.log(time + "TIMEEEEEEEE");
     console.log(message_time_at + "TIMEEEEEEEE");
+    let minute = message_time_wo_at_wo_pmam.includes(":") ? message_time_wo_at_wo_pmam.split(":")[1] : 0;
+    let hour = message_time_wo_at_wo_pmam.includes(":")
+      ? message_time_wo_at_wo_pmam.split(":")[0]
+      : message_time_wo_at_wo_pmam;
+    console.log(minute + "CHINCHANCONGGGG")
+    console.log(hour + "CHINCHANCONGGGG")
+    console.log(message_time_wo_at_wo_pmam + "CHINCHANCONGGGG")
+    console.log(typeof(hour))
+    
+    hour = is_pm ? parseInt(hour) + 12 : hour;
+    hour = hour == 12 ? 0 : hour;
+    hour = hour == 24 ? 12 : hour; 
+    console.log(hour + " HOUR CONVERTED") 
 
-    cron.schedule(`${0} ${23} ${23} ${day} ${month} * ${year}`, () => {
+    cron.schedule(`${0} ${minute} ${hour} ${day} ${month} * ${year}`, () => {
       bot.telegram.sendMessage(
         ctx.message.chat.id,
         `${"Hey " + ctx.message.chat.first_name + ". " + reply_first_half}`
