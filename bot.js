@@ -32,7 +32,7 @@ bot.start((ctx) => {
     "This is how I work: Tell me what you want to remind you and at which time. That's it!"
   );
   ctx.reply(
-    "Here's an example: I'll visit mom this weekend. Remind me this saturday at 10am"
+    "Here's an example: I'll visit mom on the weekend. Remind me this saturday at 10am"
   );
   ctx.reply("Try the example above to continue the tutorial! To hear a ");
 });
@@ -45,19 +45,23 @@ bot.use((ctx) => {
     /[re][mer][emi][imn][ind][nd]\sme\snext\s(monday|tuesday|wednesday|thursday|friday|saturday|sunday)at\s\d[012]?([ap]m|\s[ap]m|:\d\d[ap]m|:\d\d\s[ap]m)/i;
   let absolute_date =
     /[re][mer][emi][imn][ind][nd]\sme\son\s\d\d?\s(january|february|march|april|may|june|july|august|september|october|november|december)\sat\s\d[012]?([ap]m|\s[ap]m|:\d\d[ap]m|:\d\d\s[ap]m)/i;
+
+  let relative_time =
+    /[re][mer][emi][imn][ind][nd]\sme\sin\s\d\d?\s(seconds|minutes|hours)/i;
   //checks whether is this week or next ()
   let test_this = this_regex.test(message);
   let test_next = next_regex.test(message);
   let test_absolute_date = absolute_date.test(message);
-
+  let test_relative_time = relative_time.test(message);
+  console.log(test_relative_time + "     RELATIVEEEEE TIMEEE");
   //match the dot and slice afterwards. It gets the whole command part of the message users send. It only uses the second part as it's the command for the alarm
   let match_dot = message.match(/\./);
   let message_second_half = message.slice(match_dot.index);
 
   //match the "at" and slice everything afterwards (used to take the hour:minute of the alarm).
   let match_at = message.match(/at\s/);
-  let message_time_at = message.slice(match_at.index);
-  let message_time_at_wo_at = message_time_at.split("at ")[1];
+  let message_time_at_wo_at =
+    match_at == null ? "at no" : message.slice(match_at.index).split("at ")[1];
   console.log(message_time_at_wo_at);
 
   let is_pm = message_time_at_wo_at.includes("pm") ? 1 : 0;
@@ -131,7 +135,6 @@ bot.use((ctx) => {
     console.log(dayweek, month, day, year, time);
     //use it as params for the schedule API cron:
     console.log(time + "TIMEEEEEEEE");
-    console.log(message_time_at + "TIMEEEEEEEE");
     let minute = message_time_wo_at_wo_pmam.includes(":")
       ? message_time_wo_at_wo_pmam.split(":")[1]
       : 0;
@@ -148,6 +151,7 @@ bot.use((ctx) => {
     hour = hour == 24 ? 12 : hour;
     console.log(hour + " HOUR CONVERTED");
 
+    //this is for the absolute ones. If it's absolute, it takes the date from the message. If it's this/on or next, it changes nothing
     day =
       typeof absolute_date_message == typeof message
         ? message_second_half.split("me on ")[1].split(" ")[0]
@@ -168,7 +172,9 @@ bot.use((ctx) => {
       );
       //we send a message repeating the first half (the reason) converted to the second person
     });
-  } else {
+  }
+  // else if(){
+  else {
     //if the previous condition wasn't met, the bot reminds the actual syntax
     return ctx.reply("The syntax must be: This/Next dayofweek task");
   }
