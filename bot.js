@@ -5,7 +5,7 @@ const { time } = require("console");
 const { Telegraf } = require("telegraf");
 const cron = require("node-cron");
 
-const bot = new Telegraf("1711136458:AAH8wlMvtdcp9RtMLOVJmd3fCqlTWq8XR1w");
+const bot = new Telegraf("1709314984:AAHXqCrhxdFoGbM8MJAVWUAElrPdhQA7x8w");
 
 //INSIGHTS:
 //super easy to set the alarm in absolute values. That's what I did by setting the this and next week. That's hard. Setting the time by asking it it's easy af
@@ -15,13 +15,12 @@ const bot = new Telegraf("1711136458:AAH8wlMvtdcp9RtMLOVJmd3fCqlTWq8XR1w");
 //got an idea, the start message is a tutorial? How so? has a "I'll visit mom this weekend. Remind me in 20 seconds" Try it! If the user actually sends that, it receives an answer from a ctx.hear("I'll visit mom this weekend. Remind me in 20 seconds") as well as the alarm set to 20 seconds! Then it gets the following message:
 //"Fantastic! Remember that you can use absolute units (19 of july, 10:41pm/am, 2 pm, 6am) as relative to the moment you talk to me such as next friday, today, tomorrow, in 40 minutes, in 6 hours. However, I don't like units such as 23:32, or 16:00. It's so confusing. "
 
-
+//add seconds
 //to do: more complete /start response (with instructions & everything)
 //should have an alarm for "in an hour?"
 //thank you? you're welcome
 //check current alarms
 //make a server retain this stuff (instead of my machine)
-//update token
 //should get conditionals for other than this & next week
 //should have a default for whenever at: is not specified
 //improve the instruction for when the syntax is wrong
@@ -29,9 +28,15 @@ const bot = new Telegraf("1711136458:AAH8wlMvtdcp9RtMLOVJmd3fCqlTWq8XR1w");
 //premium:
 //should have a personal config for whenever at: is not specified
 bot.start((ctx) => {
-  ctx.reply(`Hi ${ctx.message.chat.first_name}! Thank you for having me`);
+  ctx.reply(`Hi ${ctx.message.chat.first_name}! It's great to have you`);
   ctx.reply(
-    "This is I work: Tell me what to remind you and at which time. That's it. I'll give you an example: I'll visit mom on the weekend. Remind me this saturday at 10am"
+    "This is how I work: Tell me what you want to remind you and at which time. That's it!"
+  );
+  ctx.reply(
+    "Here's an example: I'll visit mom on the weekend. Remind me this saturday at 10am"
+  );
+  ctx.reply(
+    "Try the example above to continue the tutorial! To hear a "
   );
 });
 
