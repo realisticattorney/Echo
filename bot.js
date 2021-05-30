@@ -7,6 +7,25 @@ const cron = require("node-cron");
 
 const bot = new Telegraf("1711136458:AAH8wlMvtdcp9RtMLOVJmd3fCqlTWq8XR1w");
 
+//INSIGHTS:
+//super easy to set the alarm in absolute values. That's what I did by setting the this and next week. That's hard. Setting the time by asking it it's easy af
+//my approach is confusing. At some parts I manipulate the current time so I get the time the alarm will be triggered by interpreting the user message. But I only modify some of the variables. So for instance I have the day, month and year of the (future) promise, but the hour and minutes of current time (as those went through my functions without changes)
+
+//18:41pm is permitted. I need a conditional such that bigger than 12, it can't be pm/am
+
+
+//to do: more complete /start response (with instructions & everything)
+//should have an alarm for "in an hour?"
+//thank you? you're welcome
+//check current alarms
+//make a server retain this stuff (instead of my machine)
+//update token 
+//should get conditionals for other than this & next week
+//should have a default for whenever at: is not specified
+//improve the instruction for when the syntax is wrong
+
+//premium:
+//should have a personal config for whenever at: is not specified
 bot.start((ctx) => {
   ctx.reply("Welcome");
 });
@@ -14,63 +33,87 @@ bot.start((ctx) => {
 bot.use((ctx) => {
   let message = ctx.message.text;
   let this_regex =
-    /[re][mer][emi][imn][ind][nd]\sme\sthis\s(monday|tuesday|wednesday|thursday|friday|saturday|sunday)\sat\s\d([ap]m|\s[ap]m|:\d\d[ap]m)/i;
+    /[re][mer][emi][imn][ind][nd]\sme\sthis\s(monday|tuesday|wednesday|thursday|friday|saturday|sunday)\sat\s\d{1,2}([ap]m|\s[ap]m|:\d\d[ap]m|:\d\d\s[ap]m)/i;
   let next_regex =
-    /[re][mer][emi][imn][ind][nd]\sme\snext\s(monday|tuesday|wednesday|thursday|friday|saturday|sunday)at\s\d([ap]m|\s[ap]m|:\d\d[ap]m)/i;
+    /[re][mer][emi][imn][ind][nd]\sme\snext\s(monday|tuesday|wednesday|thursday|friday|saturday|sunday)at\s\d{1,2}([ap]m|\s[ap]m|:\d\d[ap]m|:\d\d\s[ap]m)/i;
 
+  //checks whether is this week or next ()
   let test_this = this_regex.test(message);
   let test_next = next_regex.test(message);
 
+  //match the dot and slice afterwards. It gets the whole command part of the message users send. It only uses the second part as it's the command for the alarm
   let match_dot = message.match(/\./);
   let message_second_half = message.slice(match_dot.index);
 
+  //match the "at" and slice everything afterwards (used to take the hour:minute of the alarm).
+  let match_at = message.match(/at\s/);
+  let message_time_at = message.slice(match_at.index);
+  let message_time_at_wo_at = message_time_at.split("at ")[1]
+  console.log(message_time_at_wo_at)
+  let pm_or_am = message_time_at_wo_at.includes("pm") ? 1 : 0;
+
+
+  //replaces the subject from first to second person in sequence
   let replace_you_i = message.replace(/I/, "you");
   let replace_my_your = replace_you_i.replace(/my/, "your");
   let reply = replace_my_your.replace(/remind\sme/i, "I'll remind you");
 
+  //match the dot and slice afterwards. It gets the whole command part of the message users send. It only uses the first part as it's the reason the user set the alarm
   let reply_dot = reply.match(/\./);
   let reply_first_half = reply.slice(0, reply_dot.index);
 
-  let match_this = message.match(/t[hi][ihs][si]/gi);
+  //useless?
   let time_now = new Date().toLocaleString();
 
-  if (test_this == 1 || test_next == 1) {
+  //if the command was properly written, it should include instructions to get the alarm this week or the next one
+  if (test_this == 1 || test_next == 1 && pm_or_am != undefined) {
+    //takes the outside, global declared var to return the day of the week from the latter part of the message
     let day_DAY = thisFunction(message_second_half);
+    //debugging
     console.log(day_DAY + "day_DAY");
     console.log(test_this + "test_this");
+    //if the conditional met was 1 it will add 7 days to the current date( called in the dateFinder function)
     let whichDate =
       test_next == 1 ? dateFinder(day_DAY, 1) : dateFinder(day_DAY, 0);
+    //to ensure current date is not modified, we call it again outside dateFinder
     let date_now = new Date();
     date_now.setDate(date_now.getDate() + whichDate);
+    //we call it this way to get the humanized formatted date
     let date_now_string = `${date_now}`;
-
+    //debugging to check if the date return is consistent with the message
     console.log(whichDate);
     console.log(date_now_string);
-    
+    //however humanizied, the value of the current date is an object (that with console.log looks like a string) so we convert it to a string to use the split() method:
     date_now_string = date_now_string.toString();
+    //reestructure every piece of data we need
     let [dayweek, month, day, year, time] = date_now_string.split(" ");
     console.log(dayweek, month, day, year, time);
+    //use it as params for the schedule API cron:
+    console.log(time + "TIMEEEEEEEE")
+    console.log(message_time_at + "TIMEEEEEEEE");
+
+
     cron.schedule(`${0} ${23} ${23} ${day} ${month} * ${year}`, () => {
       bot.telegram.sendMessage(
         ctx.message.chat.id,
         `${"Hey " + ctx.message.chat.first_name + ". " + reply_first_half}`
       );
+      //we send a message repeating the first half (the reason) converted to the second person
     });
   } else {
+    //if the previous condition wasn't met, the bot reminds the actual syntax
     return ctx.reply("The syntax must be: This/Next dayofweek task");
   }
-
+  //debugging
   console.log(ctx.update);
   console.log(ctx.message.chat.id);
-  // let time_now = new Date().toLocaleString();
-  // console.log(time_now);
   ctx.reply(reply);
   bot.hears("this", (ctx) => {
     console.log(ctx);
   });
-  console.log(match_this); //it returns an array
-});
+}); //here the use method finishes. it's triggered by ANY interaction with the bot
 
+//without this the bot never starts
 bot.launch();
 
 const dateFinder = (weekday, this_or_next) => {
