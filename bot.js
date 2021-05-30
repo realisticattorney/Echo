@@ -47,7 +47,7 @@ bot.use((ctx) => {
     /[re][mer][emi][imn][ind][nd]\sme\son\s\d\d?\s(january|february|march|april|may|june|july|august|september|october|november|december)\sat\s\d[012]?([ap]m|\s[ap]m|:\d\d[ap]m|:\d\d\s[ap]m)/i;
 
   let relative_time =
-    /[re][mer][emi][imn][ind][nd]\sme\sin\s\d\d?\s(seconds|minutes|hours)/i;
+    /[re][mer][emi][imn][ind][nd]\sme\sin\s\d\d?\s(seconds|second|sec|min|minute|minutes|hs|hour|hours)/i;
   //checks whether is this week or next ()
   let test_this = this_regex.test(message);
   let test_next = next_regex.test(message);
@@ -81,7 +81,6 @@ bot.use((ctx) => {
   //replaces the subject from first to second person in sequence
   let replace_you_i = message.replace(/I/, "you");
   let replace_my_your = replace_you_i.replace(/my/, "your");
-  let match_first_char = replace_my_your.match(/^[a-z]?/);
   function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
   }
@@ -172,9 +171,44 @@ bot.use((ctx) => {
       );
       //we send a message repeating the first half (the reason) converted to the second person
     });
-  }
-  // else if(){
-  else {
+  } else if (test_relative_time == 1) {
+    let time_coordinates = message_second_half.split("me in ")[1];
+    [amount, unit] = time_coordinates.split(" ");
+
+    let date_now = new Date();
+    let date_now_string = `${date_now}`;
+    date_now_string = date_now_string.toString();
+    let [dayweek, month, day, year, time] = date_now_string.split(" ");
+    console.log(dayweek, month, day, year, time);
+
+    [hour, minute, seconds] = time.split(":");
+    console.log(unit);
+    seconds =
+      unit == "seconds" || unit == "second" || unit == "sec" || unit == "s"
+        ? parseInt(seconds) + parseInt(amount)
+        : seconds;
+    minute =
+      unit == "minutes" || unit == "minutes" || unit == "min" || unit == "m"
+        ? parseInt(minute) + parseInt(amount)
+        : minute;
+    hour =
+      unit == "hours" || unit == "hour" || unit == "hs" || unit == "h"
+        ? parseInt(hour) + parseInt(amount)
+        : hour;
+    console.log(seconds + "seconds");
+    console.log(minute + "minute");
+    console.log(hour + "hours");
+
+    cron.schedule(
+      `${seconds} ${minute} ${hour} ${day} ${month} * ${year}`,
+      () => {
+        bot.telegram.sendMessage(
+          ctx.message.chat.id,
+          `${"Hey " + ctx.message.chat.first_name + ". " + reply_first_half}`
+        );
+      }
+    );
+  } else {
     //if the previous condition wasn't met, the bot reminds the actual syntax
     return ctx.reply("The syntax must be: This/Next dayofweek task");
   }
