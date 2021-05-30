@@ -35,9 +35,7 @@ bot.start((ctx) => {
   ctx.reply(
     "Here's an example: I'll visit mom on the weekend. Remind me this saturday at 10am"
   );
-  ctx.reply(
-    "Try the example above to continue the tutorial! To hear a "
-  );
+  ctx.reply("Try the example above to continue the tutorial! To hear a ");
 });
 
 bot.use((ctx) => {
@@ -46,10 +44,12 @@ bot.use((ctx) => {
     /[re][mer][emi][imn][ind][nd]\sme\sthis\s(monday|tuesday|wednesday|thursday|friday|saturday|sunday)\sat\s\d[012]?([ap]m|\s[ap]m|:\d\d[ap]m|:\d\d\s[ap]m)/i;
   let next_regex =
     /[re][mer][emi][imn][ind][nd]\sme\snext\s(monday|tuesday|wednesday|thursday|friday|saturday|sunday)at\s\d[012]?([ap]m|\s[ap]m|:\d\d[ap]m|:\d\d\s[ap]m)/i;
-
+  let absolute_date =
+    /[re][mer][emi][imn][ind][nd]\sme\sthe\s\d\d?\sof\s(january|february|march|april|may|june|july|august|september|october|november|december)\sat\s\d[012]?([ap]m|\s[ap]m|:\d\d[ap]m|:\d\d\s[ap]m)/i;
   //checks whether is this week or next ()
   let test_this = this_regex.test(message);
   let test_next = next_regex.test(message);
+  let test_absolute_date = absolute_date.test(message);
 
   //match the dot and slice afterwards. It gets the whole command part of the message users send. It only uses the second part as it's the command for the alarm
   let match_dot = message.match(/\./);
@@ -64,9 +64,16 @@ bot.use((ctx) => {
   let is_pm = message_time_at_wo_at.includes("pm") ? 1 : 0;
   let is_am = message_time_at_wo_at.includes("am") ? 1 : 0;
 
-  let message_time_wo_at_wo_pmam = message_time_at_wo_at.split(" ").join("").split("p").join("").split("a").join("").split("m").join("")
+  let message_time_wo_at_wo_pmam = message_time_at_wo_at
+    .split(" ")
+    .join("")
+    .split("p")
+    .join("")
+    .split("a")
+    .join("")
+    .split("m")
+    .join("");
   console.log(message_time_wo_at_wo_pmam);
-
 
   //replaces the subject from first to second person in sequence
   let replace_you_i = message.replace(/I/, "you");
@@ -81,20 +88,27 @@ bot.use((ctx) => {
   let time_now = new Date().toLocaleString();
   //
   //if the command was properly written, it should include instructions to get the alarm this week or the next one
-  //************ 
-  //************ 
-  //************ 
-  //************ 
-  if ((test_this == 1 || test_next == 1) && (is_pm == 1 || is_am == 1)) {
+  //************
+  //************
+  //************
+  //************
+  if (
+    (test_this == 1 || test_next == 1 || test_absolute_date == 1) &&
+    (is_pm == 1 || is_am == 1)
+  ) {
     //takes the outside, global declared var to return the day of the week from the latter part of the message
-    let day_DAY = thisFunction(message_second_half);
+    let day_DAY = test_absolute_date == 0 ? thisFunction(message_second_half) : 0;
     //debugging
     console.log(day_DAY + "day_DAY");
     console.log(test_this + "test_this");
     //if the conditional met was 1 it will add 7 days to the current date( called in the dateFinder function)
-    let whichDate =
-      test_next == 1 ? dateFinder(day_DAY, 1) : dateFinder(day_DAY, 0);
+    let whichDate = test_next == 1 ? dateFinder(day_DAY, 1) : "absolute";
+    whichDate = test_this == 1 ? dateFinder(day_DAY, 0) : "absolute";
     //to ensure current date is not modified, we call it again outside dateFinder
+    let absolute_date_message =
+      whichDate == "absolute" ? message_second_half : 0;
+    whichDate = whichDate == "absolute" ? 0 : whichDate;
+
     let date_now = new Date();
     date_now.setDate(date_now.getDate() + whichDate);
     //we call it this way to get the humanized formatted date
@@ -110,19 +124,34 @@ bot.use((ctx) => {
     //use it as params for the schedule API cron:
     console.log(time + "TIMEEEEEEEE");
     console.log(message_time_at + "TIMEEEEEEEE");
-    let minute = message_time_wo_at_wo_pmam.includes(":") ? message_time_wo_at_wo_pmam.split(":")[1] : 0;
+    let minute = message_time_wo_at_wo_pmam.includes(":")
+      ? message_time_wo_at_wo_pmam.split(":")[1]
+      : 0;
     let hour = message_time_wo_at_wo_pmam.includes(":")
       ? message_time_wo_at_wo_pmam.split(":")[0]
       : message_time_wo_at_wo_pmam;
-    console.log(minute + "CHINCHANCONGGGG")
-    console.log(hour + "CHINCHANCONGGGG")
-    console.log(message_time_wo_at_wo_pmam + "CHINCHANCONGGGG")
-    console.log(typeof(hour))
-    
+    console.log(minute + "CHINCHANCONGGGG");
+    console.log(hour + "CHINCHANCONGGGG");
+    console.log(message_time_wo_at_wo_pmam + "CHINCHANCONGGGG");
+    console.log(typeof hour);
+
     hour = is_pm ? parseInt(hour) + 12 : hour;
     hour = hour == 12 ? 0 : hour;
-    hour = hour == 24 ? 12 : hour; 
-    console.log(hour + " HOUR CONVERTED") 
+    hour = hour == 24 ? 12 : hour;
+    console.log(hour + " HOUR CONVERTED");
+
+    day =
+      typeof absolute_date_message == typeof message
+        ? message_second_half.split("me the ")[1].split(" ")[0]
+        : day;
+    month =
+      typeof absolute_date_message == typeof message
+        ? message_second_half
+            .split("me the ")[1]
+            .split(" ")[2]
+            .split(".")
+            .join("")
+        : month;
 
     cron.schedule(`${0} ${minute} ${hour} ${day} ${month} * ${year}`, () => {
       bot.telegram.sendMessage(
