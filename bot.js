@@ -11,15 +11,14 @@ const bot = new Telegraf("1711136458:AAH8wlMvtdcp9RtMLOVJmd3fCqlTWq8XR1w");
 //super easy to set the alarm in absolute values. That's what I did by setting the this and next week. That's hard. Setting the time by asking it it's easy af
 //my approach is confusing. At some parts I manipulate the current time so I get the time the alarm will be triggered by interpreting the user message. But I only modify some of the variables. So for instance I have the day, month and year of the (future) promise, but the hour and minutes of current time (as those went through my functions without changes)
 
-//18:41pm is permitted. I need a conditional such that bigger than 12, it can't be pm/am
-
+//have to avoid 00:12pm, and 00:12am (it's not that relevant)
 
 //to do: more complete /start response (with instructions & everything)
 //should have an alarm for "in an hour?"
 //thank you? you're welcome
 //check current alarms
 //make a server retain this stuff (instead of my machine)
-//update token 
+//update token
 //should get conditionals for other than this & next week
 //should have a default for whenever at: is not specified
 //improve the instruction for when the syntax is wrong
@@ -33,9 +32,9 @@ bot.start((ctx) => {
 bot.use((ctx) => {
   let message = ctx.message.text;
   let this_regex =
-    /[re][mer][emi][imn][ind][nd]\sme\sthis\s(monday|tuesday|wednesday|thursday|friday|saturday|sunday)\sat\s\d{1,2}([ap]m|\s[ap]m|:\d\d[ap]m|:\d\d\s[ap]m)/i;
+    /[re][mer][emi][imn][ind][nd]\sme\sthis\s(monday|tuesday|wednesday|thursday|friday|saturday|sunday)\sat\s\d[012]?([ap]m|\s[ap]m|:\d\d[ap]m|:\d\d\s[ap]m)/i;
   let next_regex =
-    /[re][mer][emi][imn][ind][nd]\sme\snext\s(monday|tuesday|wednesday|thursday|friday|saturday|sunday)at\s\d{1,2}([ap]m|\s[ap]m|:\d\d[ap]m|:\d\d\s[ap]m)/i;
+    /[re][mer][emi][imn][ind][nd]\sme\snext\s(monday|tuesday|wednesday|thursday|friday|saturday|sunday)at\s\d[012]?([ap]m|\s[ap]m|:\d\d[ap]m|:\d\d\s[ap]m)/i;
 
   //checks whether is this week or next ()
   let test_this = this_regex.test(message);
@@ -48,10 +47,11 @@ bot.use((ctx) => {
   //match the "at" and slice everything afterwards (used to take the hour:minute of the alarm).
   let match_at = message.match(/at\s/);
   let message_time_at = message.slice(match_at.index);
-  let message_time_at_wo_at = message_time_at.split("at ")[1]
-  console.log(message_time_at_wo_at)
-  let pm_or_am = message_time_at_wo_at.includes("pm") ? 1 : 0;
+  let message_time_at_wo_at = message_time_at.split("at ")[1];
+  console.log(message_time_at_wo_at);
 
+  let is_pm = message_time_at_wo_at.includes("pm") ? 1 : 0;
+  let is_am = message_time_at_wo_at.includes("am") ? 1 : 0;
 
   //replaces the subject from first to second person in sequence
   let replace_you_i = message.replace(/I/, "you");
@@ -64,9 +64,9 @@ bot.use((ctx) => {
 
   //useless?
   let time_now = new Date().toLocaleString();
-
+  //
   //if the command was properly written, it should include instructions to get the alarm this week or the next one
-  if (test_this == 1 || test_next == 1 && pm_or_am != undefined) {
+  if ((test_this == 1 || test_next == 1) && (is_pm == 1 || is_am == 1)) {
     //takes the outside, global declared var to return the day of the week from the latter part of the message
     let day_DAY = thisFunction(message_second_half);
     //debugging
@@ -89,9 +89,8 @@ bot.use((ctx) => {
     let [dayweek, month, day, year, time] = date_now_string.split(" ");
     console.log(dayweek, month, day, year, time);
     //use it as params for the schedule API cron:
-    console.log(time + "TIMEEEEEEEE")
+    console.log(time + "TIMEEEEEEEE");
     console.log(message_time_at + "TIMEEEEEEEE");
-
 
     cron.schedule(`${0} ${23} ${23} ${day} ${month} * ${year}`, () => {
       bot.telegram.sendMessage(
