@@ -150,6 +150,7 @@ bot.use((ctx) => {
     hour = hour == 24 ? 12 : hour;
     console.log(hour + " HOUR CONVERTED");
 
+    
     //this is for the absolute ones. If it's absolute, it takes the date from the message. If it's this/on or next, it changes nothing
     day =
       typeof absolute_date_message == typeof message
