@@ -192,7 +192,11 @@ bot.use((ctx) => {
         ? parseInt(minute) + parseInt(amount)
         : minute;
     hour =
-      unit == "hours" || unit == "hour" || unit == "hs" || unit == "h"
+      unit == "hours" ||
+      unit == "hour" ||
+      unit == "hs" ||
+      unit == "hr" ||
+      unit == "h"
         ? parseInt(hour) + parseInt(amount)
         : hour;
     console.log(seconds + "seconds");
