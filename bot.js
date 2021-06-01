@@ -27,14 +27,9 @@ const bot = new Telegraf("1709314984:AAHXqCrhxdFoGbM8MJAVWUAElrPdhQA7x8w");
 //premium:
 //should have a personal config for whenever at: is not specified
 bot.start((ctx) => {
-  ctx.reply(`Hi ${ctx.message.chat.first_name}! It's great to have you`);
   ctx.reply(
-    "This is how I work: Tell me what you want to remind you and at which time. That's it!"
+    `Hi ${ctx.message.chat.first_name}! I'm really excited to have you\n\nTo get you going right away, let me show you how to use FreeMinder with a couple of examples:\n\n\nRemind me to order pizza in 20 minutes\n\nRemind me to drink water in 1 hr\n\nRemind me to watch the game today at 21hs\n\nRemind me to visit mom next sunday at 10:20am\n\nRemind me to buy presents on 24 december at 6:45 pm\n\n\nHope it helps. For more details send\n/help`
   );
-  ctx.reply(
-    "Here's an example: I'll visit mom on the weekend. Remind me this saturday at 10am"
-  );
-  ctx.reply("Try the example above to continue the tutorial! To hear a ");
 });
 
 bot.use((ctx) => {
@@ -42,7 +37,7 @@ bot.use((ctx) => {
   let is_reminder = /[re][mer][emi][imn][ind][nd]\sme\sto\s/i;
 
   let today_tomorrow =
-    /(today|tomorrow)\sat\s(\d[012]?(:[0-6]\d)?\s?[pa]m|\d\d\s?h?[rs]?)/i;
+    /(today|tomorrow)?\s?at\s(\d[012]?(:[0-6]\d)?\s?[pa]m|\d\d\s?h?[rs]?)/i;
 
   let this_regex =
     /(this|on)\s(monday|tuesday|wednesday|thursday|friday|saturday|sunday)\sat\s(\d[012]?(:[0-6]\d)?\s?[pa]m|\d\d\s?h?[rs]?)/i;
@@ -51,7 +46,7 @@ bot.use((ctx) => {
   let absolute_date =
     /on\s\d\d?\s(january|february|march|april|may|june|july|august|september|october|november|december)\sat\s(\d[012]?(:[0-6]\d)?\s?[pa]m|\d\d\s?h?[rs]?)/i;
   let relative_time =
-    /in\s\d\d?\s(seconds|second|sec|min|minute|minutes|hs|hour|hours)/i;
+    /in\s\d\d?\s?(seconds|second|sec|min|minute|minutes|hs|hr|hour|hours)/i;
   //checks whether is this week or next ()
   let if_is_reminder = is_reminder.test(message);
   let test_today_tomorrow = today_tomorrow.test(message);
@@ -292,7 +287,7 @@ bot.use((ctx) => {
     );
   } else if (test_today_tomorrow == 1) {
      let date_now = new Date();
-    let whichDate = time_message.includes("today") ? 0 : 1
+    let whichDate = time_message.includes("tomorrow") ? 1 : 0;
      date_now.setDate(date_now.getDate() + whichDate);
      //   //we call it this way to get the humanized formatted date
      let date_now_string = `${date_now}`;
